@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Interactiva - Ingeniería Comercial</title>
+    <style>
+        :root {
+            /* Modo Claro (Beige Suave) */
+            --bg-body: #fdfbf7; 
+            --text-main: #333333;
+            --text-muted: #666666;
+            --bg-card: #ffffff;
+            --border-card: #dddddd;
+            --bg-title: #ffffff;
+            --color-title: #2c3e50;
+            
+            /* Colores de áreas de formación (Tonos Pastel Suaves) */
+            --bg-integral: #ffe0b2; /* Durazno pastel */
+            --bg-basica: #dcedc8;   /* Verde agua pastel */
+            --bg-profesional: #fff9c4; /* Crema pastel */
+            --bg-blanco: #ffffff;
+            --border-blanco: #cccccc;
+
+            /* Estados Interactivos (Pasteles) */
+            --color-aprobado-bg: #a5d6a7; /* Verde pastel */
+            --color-aprobado-border: #81c784;
+            --color-aprobado-text: #1b5e20;
+
+            --color-reprobado-bg: #ef9a9a; /* Rojo/Rosado pastel */
+            --color-reprobado-border: #e57373;
+            --color-reprobado-text: #b71c1c;
+
+            --color-cursando-bg: #fff59d; /* Amarillo pastel */
+            --color-cursando-border: #fff176;
+            --color-cursando-text: #5c5300;
+            --color-cursando-shadow: rgba(255, 241, 118, 0.4);
+
+            /* Botones y UI */
+            --btn-limpiar-bg: #e57373;
+            --btn-limpiar-hover: #ef5350;
+            --btn-tema-bg: transparent;
+            --btn-tema-border: #333333;
+            --bg-dashboard: #ffffff;
+        }
+
+        body.dark-mode {
+            /* Modo Oscuro */
+            --bg-body: #1a1a1a;
+            --text-main: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --bg-card: #2d2d2d;
+            --border-card: #444444;
+            --bg-title: #222222;
+            --color-title: #fdfbf7; 
+            
+            /* Colores de áreas de formación adaptados (Más opacos) */
+            --bg-integral: #5d4037;
+            --bg-basica: #33691e;
+            --bg-profesional: #827717;
+            --bg-blanco: #333333;
+            --border-blanco: #555555;
+
+            /* Estados Interactivos (Modo Oscuro) */
+            --color-aprobado-bg: #2e7d32; 
+            --color-aprobado-border: #1b5e20;
+            --color-aprobado-text: #e8f5e9;
+
+            --color-reprobado-bg: #c62828; 
+            --color-reprobado-border: #b71c1c;
+            --color-reprobado-text: #ffebee;
+
+            --color-cursando-bg: #f9a825; 
+            --color-cursando-border: #f57f17;
+            --color-cursando-text: #fffde7;
+            --color-cursando-shadow: rgba(249, 168, 37, 0.3);
+
+            /* Botones y UI */
+            --btn-limpiar-bg: #b71c1c;
+            --btn-limpiar-hover: #7f0000;
+            --btn-tema-bg: #333333;
+            --btn-tema-border: #fdfbf7;
+            --bg-dashboard: #222222;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        
+        #btn-tema {
+            background-color: var(--btn-tema-bg);
+            color: var(--text-main);
+            border: 1px solid var(--btn-tema-border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #btn-tema:hover {
+            background-color: var(--text-main);
+            color: var(--bg-body);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--color-title);
+            margin-top: 0;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        .instrucciones {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .leyenda {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border-card);
+        }
+        .bg-integral { background-color: var(--bg-integral); color: var(--text-main); }
+        .bg-basica { background-color: var(--bg-basica); color: var(--text-main); }
+        .bg-profesional { background-color: var(--bg-profesional); color: var(--text-main); }
+        .bg-blanco { background-color: var(--bg-blanco); border: 1px solid var(--border-blanco); color: var(--text-main); } 
+        
+        /* Clases de estado usando las variables pasteles */
+        .aprobado {
+            background-color: var(--color-aprobado-bg) !important;
+            color: var(--color-aprobado-text) !important;
+            border-color: var(--color-aprobado-border) !important;
+        }
+        .aprobado .sct { color: var(--color-aprobado-text) !important; opacity: 0.8; }
+
+        .reprobado {
+            background-color: var(--color-reprobado-bg) !important;
+            color: var(--color-reprobado-text) !important;
+            border-color: var(--color-reprobado-border) !important;
+        }
+        .reprobado .sct { color: var(--color-reprobado-text) !important; opacity: 0.8; }
+
+        .cursando {
+            background-color: var(--color-cursando-bg) !important; 
+            color: var(--color-cursando-text) !important; 
+            border-color: var(--color-cursando-border) !important;
+            box-shadow: 0 0 10px var(--color-cursando-shadow) !important;
+        }
+        .cursando .sct { color: var(--color-cursando-text) !important; opacity: 0.8; }
+
+        .malla-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+        .semestre-col {
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .semestre-title {
+            text-align: center;
+            font-weight: bold;
+            background-color: var(--bg-title);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s;
+        }
+        .asignatura {
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 13px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 80px;
+            user-select: none;
+            opacity: 0.4; 
+        }
+        
+        .asignatura.aprobado, .asignatura.cursando, .asignatura.reprobado {
+            opacity: 1 !important;
+        }
+        
+        .asignatura:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        .sct {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        /* Dashboard Inferior */
+        .dashboard-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background-color: var(--bg-dashboard);
+            border: 2px solid var(--border-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            min-width: 200px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .stat-box h3 {
+            margin: 0 0 10px 0;
+            color: var(--color-title);
+            font-size: 16px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .status-check { color: #81c784; }
+        .status-cross { color: #e57373; }
+
+        /* Estilos del botón limpiar */
+        .contenedor-boton {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        #btn-limpiar {
+            background-color: var(--btn-limpiar-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #btn-limpiar:hover {
+            background-color: var(--btn-limpiar-hover);
+            transform: translateY(-2px);
+        }
+        #btn-limpiar:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botón Modo Oscuro/Claro -->
+    <div class="top-bar">
+        <button id="btn-tema">🌓 Modo Oscuro</button>
+    </div>
+
+    <h1>Malla Interactiva Secuencial - Ingeniería Comercial</h1>
+    <p class="instrucciones">
+        👆 <b>Instrucciones:</b> 1 clic = <b>Aprobado</b> | 2 clics = <b>Reprobado</b> | 3 clics = <b>Pendiente</b><br>
+        <i>*Las asignaturas en <b>Amarillo</b> (incluyendo electivos) son las que ya cumplen los requisitos mínimos y puedes cursar.<br>
+        *Tus cambios y el tema se guardarán automáticamente en tu dispositivo.</i>
+    </p>
+
+    <div class="leyenda">
+        <div class="leyenda-item"><div class="color-box bg-integral"></div><span>Formación Integral</span></div>
+        <div class="leyenda-item"><div class="color-box bg-basica"></div><span>Formación Básica</span></div>
+        <div class="leyenda-item"><div class="color-box bg-profesional"></div><span>Formación Profesional</span></div>
+        <div class="leyenda-item"><div class="color-box bg-blanco"></div><span>Electivo / Libre</span></div>
+        <div class="leyenda-item"><div class="color-box" style="background-color: var(--color-aprobado-bg);"></div><span>Aprobado</span></div>
+        <div class="leyenda-item"><div class="color-box" style="background-color: var(--color-reprobado-bg);"></div><span>Reprobado</span></div>
+        <div class="leyenda-item"><div class="color-box" style="background-color: var(--color-cursando-bg);"></div><span>Habilitado (Cursando)</span></div>
+    </div>
+
+    <div class="malla-container">
+        <!-- Semestre 1 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre I</div>
+            <div class="asignatura bg-basica" id="adm-gen" data-sct="5" data-sem="1">Administración General<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="der-emp" data-sct="3" data-sem="1">Derecho Empresarial<div class="sct">3 SCT</div></div>
+            <div class="asignatura bg-basica" id="alg-1" data-sct="6" data-sem="1">Álgebra I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="hab-soc" data-sct="4" data-sem="1">Habilidades Sociales<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-basica" id="con-1" data-sct="6" data-sem="1">Contabilidad I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-inst-1" data-sct="3" data-sem="1">Form. Integral Of. Institucional<div class="sct">3 SCT</div></div>
+        </div>
+
+        <!-- Semestre 2 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre II</div>
+            <div class="asignatura bg-basica" id="adm-est" data-sct="5" data-sem="2">Administración Estratégica<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="alg-2" data-sct="6" data-sem="2">Álgebra II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="cal-1" data-sct="6" data-sem="2">Cálculo I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="int-eco" data-sct="3" data-sem="2">Introducción a la Economía<div class="sct">3 SCT</div></div>
+            <div class="asignatura bg-basica" id="con-2" data-sct="6" data-sem="2">Contabilidad II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-integral" id="ing-1" data-sct="4" data-sem="2">Inglés I<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-ext-1" data-sct="2" data-sem="2">Form. Int. Extraprogramática<div class="sct">2 SCT</div></div>
+        </div>
+
+        <!-- Semestre 3 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre III</div>
+            <div class="asignatura bg-profesional" id="mkt-1" data-sct="5" data-sem="3">Marketing I<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="cal-2" data-sct="6" data-sem="3">Cálculo II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="mic-1" data-sct="6" data-sem="3">Microeconomía I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="cos" data-sct="5" data-sem="3">Costos<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-integral" id="ing-2" data-sct="4" data-sem="3">Inglés II<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-inst-2" data-sct="3" data-sem="3">Form. Integral Of. Institucional<div class="sct">3 SCT</div></div>
+        </div>
+
+        <!-- Semestre 4 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre IV</div>
+            <div class="asignatura bg-profesional" id="mkt-2" data-sct="5" data-sem="4">Marketing II<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="est-1" data-sct="6" data-sem="4">Estadística I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="mac-1" data-sct="6" data-sem="4">Macroeconomía I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="mic-2" data-sct="6" data-sem="4">Microeconomía II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="ing-neg-1" data-sct="4" data-sem="4">Inglés para Negocios I<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-integral" id="ing-3" data-sct="4" data-sem="4">Inglés III<div class="sct">4 SCT</div></div>
+        </div>
+
+        <!-- Semestre 5 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre V</div>
+            <div class="asignatura bg-profesional" id="ges-rrhh-1" data-sct="5" data-sem="5">Gestión de Recursos Humanos I<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="sis-inf" data-sct="4" data-sem="5">Sistemas de Información<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-basica" id="est-2" data-sct="6" data-sem="5">Estadística II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-basica" id="mac-2" data-sct="6" data-sem="5">Macroeconomía II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-profesional" id="ges-fin-cp" data-sct="5" data-sem="5">Gestión Financiera de Corto Plazo<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="ing-neg-2" data-sct="4" data-sem="5">Inglés para Negocios II<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-ext-2" data-sct="2" data-sem="5">Form. Int. Extraprogramática<div class="sct">2 SCT</div></div>
+        </div>
+
+        <!-- Semestre 6 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre VI</div>
+            <div class="asignatura bg-profesional" id="comp-org" data-sct="4" data-sem="6">Comportamiento Organizacional<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-profesional" id="eco-met" data-sct="6" data-sem="6">Econometría<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-profesional" id="eco-int" data-sct="4" data-sem="6">Economía Internacional<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-profesional" id="mer-cap" data-sct="5" data-sem="6">Mercados de Capitales<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-basica" id="ing-neg-3" data-sct="4" data-sem="6">Inglés para Negocios III<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-basica" id="prac-1" data-sct="4" data-sem="6">Práctica Profesional I<div class="sct">4 SCT</div></div>
+        </div>
+
+        <!-- Semestre 7 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre VII</div>
+            <div class="asignatura bg-profesional" id="com-ext" data-sct="5" data-sem="7">Comercio Exterior<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-profesional" id="ges-rrhh-2" data-sct="5" data-sem="7">Gestión de Recursos Humanos II<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-profesional" id="adm-prod" data-sct="6" data-sem="7">Administración de la Producción<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-profesional" id="con-ges" data-sct="5" data-sem="7">Control de Gestión<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-profesional" id="for-eval-proy" data-sct="6" data-sem="7">Formulación y Eval. de Proyectos<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-ext-3" data-sct="2" data-sem="7">Form. Int. Extraprogramática<div class="sct">2 SCT</div></div>
+        </div>
+
+        <!-- Semestre 8 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre VIII</div>
+            <div class="asignatura bg-profesional" id="emp" data-sct="5" data-sem="8">Emprendimiento<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-profesional" id="des-org" data-sct="5" data-sem="8">Desarrollo Organizacional<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-profesional" id="res-soc" data-sct="6" data-sem="8">Responsabilidad Social<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-profesional" id="dir-est-1" data-sct="6" data-sem="8">Dirección Estratégica I<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-profesional" id="ges-fin-lp" data-sct="6" data-sem="8">Gestión Financiera de Largo Plazo<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-inst-3" data-sct="3" data-sem="8">Form. Integral Of. Institucional<div class="sct">3 SCT</div></div>
+        </div>
+
+        <!-- Semestre 9 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre IX</div>
+            <div class="asignatura bg-blanco" data-libre="true" id="elec-1" data-sct="4" data-sem="9">Electivo I<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="elec-2" data-sct="4" data-sem="9">Electivo II<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="elec-3" data-sct="4" data-sem="9">Electivo III<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-profesional" id="dir-est-2" data-sct="6" data-sem="9">Dirección Estratégica II<div class="sct">6 SCT</div></div>
+            <div class="asignatura bg-profesional" id="prac-2" data-sct="11" data-sem="9">Práctica Profesional II<div class="sct">11 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-inst-4" data-sct="3" data-sem="9">Form. Integral Of. Institucional<div class="sct">3 SCT</div></div>
+        </div>
+
+        <!-- Semestre 10 -->
+        <div class="semestre-col">
+            <div class="semestre-title">Semestre X</div>
+            <div class="asignatura bg-profesional" id="hab-prof" data-sct="13" data-sem="10">Habilitación Profesional<div class="sct">13 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="elec-4" data-sct="4" data-sem="10">Electivo IV<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="elec-5" data-sct="4" data-sem="10">Electivo V<div class="sct">4 SCT</div></div>
+            <div class="asignatura bg-profesional" id="tal-int" data-sct="5" data-sem="10">Taller Integrado<div class="sct">5 SCT</div></div>
+            <div class="asignatura bg-blanco" data-libre="true" id="fi-ext-4" data-sct="2" data-sem="10">Form. Int. Extraprogramática<div class="sct">2 SCT</div></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Estadísticas -->
+    <div class="dashboard-container">
+        <div class="stat-box">
+            <h3>Créditos Aprobados (SCT)</h3>
+            <div class="stat-value" id="contador-sct">0</div>
+        </div>
+        <div class="stat-box">
+            <h3>Grado de Licenciatura</h3>
+            <div class="stat-value" id="status-licenciatura"><span class="status-cross">❌ Pendiente</span></div>
+        </div>
+    </div>
+
+    <div class="contenedor-boton">
+        <button id="btn-limpiar">🧹 Eliminar Asignaturas Aprobadas</button>
+    </div>
+
+    <script>
+        // --- LÓGICA DEL TEMA OSCURO / CLARO ---
+        const btnTema = document.getElementById('btn-tema');
+        
+        if (localStorage.getItem('malla_ico_tema') === 'dark') {
+            document.body.classList.add('dark-mode');
+            btnTema.innerHTML = '☀️ Modo Claro';
+        }
+
+        btnTema.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if(document.body.classList.contains('dark-mode')) {
+                btnTema.innerHTML = '☀️ Modo Claro';
+                localStorage.setItem('malla_ico_tema', 'dark');
+            } else {
+                btnTema.innerHTML = '🌓 Modo Oscuro';
+                localStorage.setItem('malla_ico_tema', 'light');
+            }
+        });
+
+        // --- LÓGICA DE LA MALLA INTERACTIVA Y GUARDADO ---
+        // Flechas de requisitos lógicos
+        const dependencias = {
+            "adm-est": ["adm-gen"],
+            "alg-2": ["alg-1"],
+            "cal-1": ["alg-2"],
+            "con-2": ["con-1"],
+            "mkt-1": ["adm-est"],
+            "cal-2": ["cal-1"],
+            "mic-1": ["int-eco", "cal-1"],
+            "cos": ["con-2"],
+            "ing-2": ["ing-1"],
+            "mkt-2": ["mkt-1"],
+            "est-1": ["alg-2"],
+            "mac-1": ["mic-1", "cal-2"],
+            "mic-2": ["mic-1"],
+            "ing-neg-1": ["ing-2"],
+            "ing-3": ["ing-2"],
+            "ges-rrhh-1": ["mkt-2"],
+            "sis-inf": ["adm-est"],
+            "est-2": ["est-1"],
+            "mac-2": ["mac-1"],
+            "ges-fin-cp": ["cos"],
+            "ing-neg-2": ["ing-neg-1"],
+            "comp-org": ["ges-rrhh-1"],
+            "eco-met": ["est-2", "mac-2"],
+            "eco-int": ["mac-2", "mic-2"],
+            "mer-cap": ["ges-fin-cp"],
+            "ing-neg-3": ["ing-neg-2"],
+            "ges-rrhh-2": ["comp-org"],
+            "con-ges": ["mer-cap"],
+            "for-eval-proy": ["ges-fin-cp"],
+            "des-org": ["ges-rrhh-2"],
+            "dir-est-1": ["con-ges"],
+            "ges-fin-lp": ["for-eval-proy"],
+            "dir-est-2": ["dir-est-1"]
+        };
+
+        // Requisitos especiales del PDF
+        const reqsEspeciales = {
+            "prac-1": { sctMinimo: 145 },
+            "emp": { sctMinimo: 180 },
+            "elec-1": { sctMinimo: 210 },
+            "elec-2": { sctMinimo: 210 },
+            "elec-3": { sctMinimo: 210 },
+            "elec-4": { sctMinimo: 210 },
+            "elec-5": { sctMinimo: 210 },
+            "prac-2": { reqLicenciatura: true },
+            "hab-prof": { reqLicenciatura: true }
+        };
+
+        const asignaturas = document.querySelectorAll('.asignatura');
+        const estadoGuardado = JSON.parse(localStorage.getItem('malla_ico_estado')) || {};
+
+        // Función principal de actualización
+        function actualizarMalla() {
+            let totalSCT = 0;
+            let ramosFaltantesParaLicenciatura = 0;
+
+            // 1. Calcular SCT totales y estatus de Licenciatura
+            asignaturas.forEach(item => {
+                let estado = item.dataset.estado;
+                let sct = parseInt(item.dataset.sct) || 0;
+                let sem = parseInt(item.dataset.sem) || 0;
+
+                if (estado === 'aprobado') {
+                    totalSCT += sct;
+                } else {
+                    // Para Licenciatura se exige aprobar TODO del Semestre 1 al 8 inclusive
+                    if (sem >= 1 && sem <= 8) {
+                        ramosFaltantesParaLicenciatura++;
+                    }
+                }
+            });
+
+            let tieneLicenciatura = (ramosFaltantesParaLicenciatura === 0);
+
+            // Actualizar la interfaz del dashboard
+            document.getElementById('contador-sct').innerText = totalSCT;
+            
+            const btnLicenciatura = document.getElementById('status-licenciatura');
+            if (tieneLicenciatura) {
+                btnLicenciatura.innerHTML = '<span class="status-check">✅ Obtenida</span>';
+            } else {
+                btnLicenciatura.innerHTML = '<span class="status-cross">❌ Pendiente</span>';
+            }
+
+            // 2. Aplicar estilos y verificar si se puede cursar cada asignatura
+            asignaturas.forEach(item => {
+                let id = item.id;
+                let estado = item.dataset.estado;
+                
+                // Limpiar clases
+                item.className = item.dataset.clasesBase;
+
+                if (estado === 'aprobado') {
+                    item.classList.add('aprobado');
+                    item.style.opacity = "1";
+                } else if (estado === 'reprobado') {
+                    item.classList.add('reprobado');
+                    item.style.opacity = "1";
+                } else {
+                    // Verificaciones de prerrequisitos lógicos y especiales
+                    let reqs = dependencias[id] || [];
+                    let reqEsp = reqsEspeciales[id];
+                    let puedeCursar = true;
+
+                    // A) Verificar flechas (ramos previos)
+                    for (let reqId of reqs) {
+                        let reqEl = document.getElementById(reqId);
+                        if (!reqEl || reqEl.dataset.estado !== 'aprobado') {
+                            puedeCursar = false;
+                            break;
+                        }
+                    }
+
+                    // B) Verificar requisitos de créditos o licenciatura (PDF Notas)
+                    if (reqEsp) {
+                        if (reqEsp.sctMinimo && totalSCT < reqEsp.sctMinimo) {
+                            puedeCursar = false;
+                        }
+                        if (reqEsp.reqLicenciatura && !tieneLicenciatura) {
+                            puedeCursar = false;
+                        }
+                    }
+
+                    // C) Aplicar estilo visual según si se puede cursar o no
+                    if (puedeCursar) {
+                        item.style.opacity = "1";
+                        // Ya sean libres o con requisitos estrictos, si se pueden cursar las pintamos de "habilitado" (amarillo)
+                        item.classList.add('cursando');
+                    } else {
+                        // Si está bloqueada, se difumina
+                        item.style.opacity = "0.4";
+                    }
+                }
+            });
+        }
+
+        function guardarEstado() {
+            const estadoActual = {};
+            asignaturas.forEach(item => {
+                estadoActual[item.id] = item.dataset.estado;
+            });
+            localStorage.setItem('malla_ico_estado', JSON.stringify(estadoActual));
+        }
+
+        // Inicializar eventos de clic
+        asignaturas.forEach(item => {
+            item.dataset.estado = estadoGuardado[item.id] || 'pendiente';
+            item.dataset.clasesBase = Array.from(item.classList).filter(c => c !== 'aprobado' && c !== 'reprobado' && c !== 'cursando').join(' ');
+
+            item.addEventListener('click', () => {
+                let current = item.dataset.estado;
+                
+                if (current === 'aprobado') {
+                    item.dataset.estado = 'reprobado';
+                } else if (current === 'reprobado') {
+                    item.dataset.estado = 'pendiente';
+                } else {
+                    item.dataset.estado = 'aprobado';
+                }
+                
+                actualizarMalla();
+                guardarEstado();
+            });
+        });
+
+        // Evento Botón Limpiar
+        document.getElementById('btn-limpiar').addEventListener('click', () => {
+            if (confirm("¿Estás seguro de que deseas limpiar y reiniciar toda la malla? Se borrarán tus SCT y créditos guardados.")) {
+                asignaturas.forEach(item => {
+                    item.dataset.estado = 'pendiente';
+                });
+                actualizarMalla();
+                localStorage.removeItem('malla_ico_estado');
+            }
+        });
+
+        // Ejecutar primera carga
+        actualizarMalla();
+    </script>
+</body>
